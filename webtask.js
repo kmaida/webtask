@@ -15,15 +15,20 @@ return function(context, callback) {
 			assert.equal(null, err);
 
 			for (var i = 0; i < commitsArr.length; i++) {
-				var commitMsg = commitsArr[i].message;
+				var thisCommit = commitsArr[i];
+				var commitMsg = thisCommit.message;
+				var lowerCommit = commitMsg.toLowerCase();
+				var iTodo = lowerCommit.indexOf('todo');
+				var todo = iTodo > -1 ? commitMsg.substr(iTodo, commitMsg.length) + ' - ' + thisCommit.author.name : null;
 
-				db.collection('commits').insertOne({commit: commitMsg}, function (err, result) {
-					assert.equal(null, err);
-					assert.equal(1, result.insertedCount);
-				});
+				if (todo) {
+					db.collection('todos').insertOne({todo: todo}, function (err, result) {
+						assert.equal(null, err);
+						assert.equal(1, result.insertedCount);
+						db.close();
+					});
+				}
 			}
-
-			db.close();
 		});
 	} else {
 		console.log('MongoDB not provided; could not save');
