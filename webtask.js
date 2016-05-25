@@ -1,28 +1,35 @@
 var mc = require('mongodb').MongoClient;
 var assert = require('assert');
 
-module.exports = function(context, req, res) {
+return function(context, cb) {
 	var ctxData = context.data;
-	var staticMsg = ctxData.message;
+	var payload = context.webhook;
 
-	mc.connect(ctxData.mongo, function(err, db) {
-		if (err) {
-			res.writeHead(500, { 'Content-Type': 'text/html'});
-			res.end('<p>An error occurred.</p>');
-		}
+	if (ctxData.mongo) {
+		mc.connect(ctxData.mongo, function (err, db) {
+			if (err) {
+				cb(err);
+			}
 
-		var collection = db.collection('messages');
+			var collection = db.collection('messages');
 
-		assert.equal(null, err);
-
-		collection.insertOne({message: staticMsg}, function(err, result) {
 			assert.equal(null, err);
-			assert.equal(1, result.insertedCount);
+
+			// collection.insertOne({todo: todoItem}, function(err, result) {
+			// 	assert.equal(null, err);
+			// 	assert.equal(1, result.insertedCount);
+			//
+			// 	db.close();
+			// });
+
+			console.log(payload);
 
 			db.close();
-		});
 
-		res.writeHead(200, { 'Content-Type': 'text/html'});
-		res.end('<h1>' + staticMsg + '</h1>');
-	});
+			cb(null, payload);
+		});
+	} else {
+		console.log('MongoDB not provided; could not save');
+		return cb();
+	}
 };
