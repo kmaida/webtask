@@ -37,7 +37,7 @@ return function(context, callback) {
 			return callback(null, { commits: commitsArr });
 		});
 	} else {
-		console.log('MongoDB not provided; could not save');
+		console.log('MongoDB not provided; could not save any todo items!');
 		return callback();
 	}
 };
