@@ -14,18 +14,16 @@ return function(context, callback) {
 
 			assert.equal(null, err);
 
-			// for (var i = 0; i < commitsArr.length; i++) {
-			// 	var commitMsg = commitsArr[i].message;
+			for (var i = 0; i < commitsArr.length; i++) {
+				var commitMsg = commitsArr[i].message;
 
-				db.collection('commits').insertOne({commit: 'hello'}, function (err, result) {
+				db.collection('commits').insertOne({commit: commitMsg}, function (err, result) {
 					assert.equal(null, err);
 					assert.equal(1, result.insertedCount);
-
-					db.close();
 				});
-			//}
+			}
 
-			//db.close();
+			db.close();
 		});
 	} else {
 		console.log('MongoDB not provided; could not save');
