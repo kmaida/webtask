@@ -5,7 +5,7 @@ return function(context, callback) {
 	var ctxData = context.data;
 	var payload = context.webhook;
 	var commitsArr = payload.commits;
-	var todo;
+	var todoObj = {};
 
 	if (ctxData.mongo) {
 		mc.connect(ctxData.mongo, function (err, db) {
@@ -21,10 +21,12 @@ return function(context, callback) {
 				var lowerCommit = commitMsg.toLowerCase();
 				var iTodo = lowerCommit.indexOf('todo');
 
-				todo = iTodo > -1 ? commitMsg.substr(iTodo, commitMsg.length) + ' - ' + thisCommit.author.name : null;
+				if (iTodo > -1) {
+					todoObj.todo = commitMsg.substr(iTodo, commitMsg.length) + ' - ' + thisCommit.author.name;
+				}
 
-				if (todo) {
-					db.collection('todos').insertOne({todo: todo}, function (err, result) {
+				if (todoObj.todo) {
+					db.collection('todos').insertOne(todoObj, function (err, result) {
 						assert.equal(null, err);
 						assert.equal(1, result.insertedCount);
 						db.close();
@@ -32,7 +34,7 @@ return function(context, callback) {
 				}
 			}
 
-			return callback(null, todo);
+			return callback(null, todoObj);
 		});
 	} else {
 		console.log('MongoDB not provided; could not save');
