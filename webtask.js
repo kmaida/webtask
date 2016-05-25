@@ -2,13 +2,12 @@ var mc = require('mongodb').MongoClient;
 var assert = require('assert');
 
 return function(context, callback) {
-	var ctxData = context.data;
-	var payload = context.webhook;
-	var commitsArr = payload.commits;
-	var todoObj = {};
+	var mdbUri = context.data.mongo;
+	var ghPayload = context.webhook;
+	var commitsArr = ghPayload.commits;
 
-	if (ctxData.mongo) {
-		mc.connect(ctxData.mongo, function (err, db) {
+	if (mdbUri) {
+		mc.connect(mdbUri, function (err, db) {
 			if (err) {
 				callback(err);
 			}
@@ -20,13 +19,14 @@ return function(context, callback) {
 				var commitMsg = thisCommit.message;
 				var lowerCommit = commitMsg.toLowerCase();
 				var iTodo = lowerCommit.indexOf('todo');
+				var thisTodo = {};
 
 				if (iTodo > -1) {
-					todoObj.todo = commitMsg.substr(iTodo, commitMsg.length) + ' - ' + thisCommit.author.name;
+					thisTodo.todo = commitMsg.substr(iTodo, commitMsg.length) + ' - ' + thisCommit.author.name;
 				}
 
-				if (todoObj.todo) {
-					db.collection('todos').insertOne(todoObj, function (err, result) {
+				if (thisTodo.todo) {
+					db.collection('todos').insertOne(thisTodo, function (err, result) {
 						assert.equal(null, err);
 						assert.equal(1, result.insertedCount);
 						db.close();
@@ -34,7 +34,7 @@ return function(context, callback) {
 				}
 			}
 
-			return callback(null, todoObj);
+			return callback(null, { commits: commitsArr });
 		});
 	} else {
 		console.log('MongoDB not provided; could not save');
