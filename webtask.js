@@ -8,10 +8,13 @@ return function(context, callback) {
 
 	/**
 	 * Connected to MongoDB
-	 * Loop over commit messages in GitHub push payload
+	 * Loop over commit messages in GitHub push payload:
 	 * For each pushed commit, check if the commit message contains a to do
-	 * If so, grab the applicable text (just takes anything after the keyword)
+	 * If so, set the applicable text (takes anything from the first occurrence of the keyword)
+	 * Set timestamp
+	 * Set author
 	 * Save object to MongoDB
+	 * Push object to response body
 	 *
 	 * @param err
 	 * @param db
@@ -19,6 +22,8 @@ return function(context, callback) {
 	 * @private
 	 */
 	function _mdbConnect(err, db) {
+		var body = { todos: [] };
+
 		if (err) {
 			callback(err);
 		}
@@ -32,14 +37,17 @@ return function(context, callback) {
 			var thisTodo = {};
 
 			if (_iTodo > -1) {
-				thisTodo.todo = _commitMsg.substr(_iTodo, _commitMsg.length) + ' - ' + _thisCommit.author.name;
+				thisTodo.todo = _commitMsg.substr(_iTodo, _commitMsg.length);
+				thisTodo.timestamp = _thisCommit.timestamp;
+				thisTodo.author = _thisCommit.committer.name;
 
 				db.collection('todos').insertOne(thisTodo, _mdbInsertCB);
+				body.todos.push(thisTodo);
 			}
 		}
 
 		db.close();
-		return callback(null, { commits: commitsArr });
+		return callback(null, body);
 	}
 
 	/**
