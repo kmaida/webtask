@@ -4,7 +4,7 @@ This webtask was created with [webtask.io](http://webtask.io) as a webhook trigg
 
 When triggered, the webhook checks the payload for commits with messages containing a keyword: `todo`. If the `todo` keyword (case insensitive) is found, an  object is inserted into a MongoDB database on [mlab](https://mlab.com) called `git-push-todo` (to the `todos` collection) with the following properties:
  
- * `todo`: First occurrence of the keyword and subsequent text
+ * `todo`: first occurrence of the `todo` keyword and subsequent message text
  * `timestamp`: commit timestamp
  * `author`: committer's name
  
