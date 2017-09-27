@@ -10,7 +10,7 @@ When triggered, the webhook checks the push payload for commits with messages co
  
 If a commit's message does not contain a `todo` keyword, nothing is inserted into the database for that commit.
 
-##How to install:
+## How to install:
 
 * If you do not already have a hosted MongoDB database, go to [mLab](https://mlab.com) and sign up for a free Sandbox account.
 * Log into mLab and create a new database with a name of your choice (`git-push-todo`, for example).
@@ -22,14 +22,14 @@ If a commit's message does not contain a `todo` keyword, nothing is inserted int
 * When code is pushed to the repository, if pushed commit messages contain a `todo` keyword, the relevant message and time/author info will be inserted into your MongoDB in a collection called `todos` (there is no need to create this collection manually, the first insertion will create it).
 * To view/redeliver webhook requests and responses, visit your repository's Settings > Webhooks & services.
 
-##Dependencies:
+## Dependencies:
 
 * [Webtask CLI](https://webtask.io/cli) and [webtask.io account](https://webtask.io/docs/sample_github) to issue tokens and generate webtask URL 
 * [smarthook.js](https://github.com/auth0/webtask-scripts/blob/master/github/smarthook.js)
 * MongoDB database and connection URI
 * A GitHub account and repository
 
-##Potential Enhancements
+## Potential Enhancements
 * Save multiple `todo` database documents from a single commit message if the `todo` keyword appears more than once within the message
 * Create an application that displays the collection in the browser
 * Build a full To Do application with the collection that can update the database to change the status of or delete the todos
